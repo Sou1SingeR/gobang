@@ -1,0 +1,274 @@
+#include <cstdio>
+#include <iostream>
+#include<stdlib.h>
+#include<time.h>
+#include<windows.h>
+
+#define BOARD_SIZE 15
+#define OFFENSIVE 1
+//"1" means player
+//"2" means computer
+
+using namespace std;
+
+class Board
+{
+
+private:
+    int board[BOARD_SIZE+2][BOARD_SIZE+2];
+        //+2:check if out of the board
+        //0:blank
+        //1:black
+        //2:white
+        //3:out of the board
+
+public:
+
+    Board()
+    //main
+    {
+        int turn=OFFENSIVE;
+        int x,y;
+        int a,b;
+        char s[10];
+
+        Init();
+        Print();
+
+        for(;;)
+        {
+            if(turn==1)
+            {
+
+                for(;;)
+                //player
+                {
+                    printf("\n     Place: ");
+                    scanf("%c%d",&a,&b);
+                    getchar();
+                    x=BOARD_SIZE+1-b;
+                    y=a-64;
+
+                    if(board[x][y]==0)
+                    {
+                        board[x][y]=OFFENSIVE;
+                        break;
+                    }
+                    else
+                    {
+                        printf("     error: %c %d\n",a,b);
+                        getchar();
+                    }
+                }
+                /*
+                for(;;)
+                //computer
+                {
+                    Place(board, OFFENSIVE, x, y);
+                    if(board[x][y]==0)
+                    {
+                        board[x][y]=OFFENSIVE;
+                        break;
+                    }
+                    else
+                    {
+                        printf("error: %c %d\n",x+64,y);
+                        getchar();
+                    }
+                }
+*/
+            }
+            else if(turn==2)
+            {
+                int cpt=rev(OFFENSIVE);
+
+                for(;;)
+                {
+                    Place(board, cpt, x, y);
+                    if(board[x][y]==0)
+                    {
+                        board[x][y]=cpt;
+                        break;
+                    }
+                    else
+                    {
+                        printf("error: %c %d\n",x+64,y);
+                        getchar();
+                    }
+                }
+            }
+            else
+            {
+                ;
+            }
+
+            turn=rev(turn);
+            system("cls");
+            Print();
+            Sleep(200);
+            if(int side=isOver())
+            {
+                if(side==OFFENSIVE)
+                {
+                    printf("     You win!\n");
+                }
+                else
+                {
+                    printf("     You lost!\n");
+                }
+                getchar();
+                break;
+            }
+        }
+    }
+
+    int rev(int turn)
+    {
+        if(turn==1)
+        {
+            return 2;
+        }
+        else if(turn==2)
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    void Init()
+    //Initialization the board
+    {
+        for(int j=0; j<BOARD_SIZE+2; ++j)
+        {
+            board[0][j]=3;
+        }
+        for(int i=1; i<BOARD_SIZE+1; ++i)
+        {
+            board[i][0]=3;
+            for(int j=1; j<BOARD_SIZE+1; ++j)
+            {
+                board[i][j]=0;
+            }
+            board[i][BOARD_SIZE+1]=3;
+        }
+        for(int j=0; j<BOARD_SIZE+2; ++j)
+        {
+            board[BOARD_SIZE+1][j]=3;
+        }
+    }
+
+    void Place(const int (*board)[BOARD_SIZE+2], const int side, int &x, int &y)
+    //Place next piece
+    {
+        srand(time(0));
+        for(;;)
+        {
+            x=rand()%BOARD_SIZE+1;
+            y=rand()%BOARD_SIZE+1;
+            if(board[x][y]==0)
+            {
+                break;
+            }
+        }
+    }
+
+    int isOver()
+    {
+        int dr[4][2]={{0,1},{1,0},{1,1},{1,-1}};//direct
+
+        for(int side=1; side<=2; ++side)
+        {
+            for(int i=1; i<BOARD_SIZE+1; ++i)
+            {
+                for(int j=1; j<BOARD_SIZE+1; ++j)
+                {
+                    for(int d=0; d<4; ++d)
+                    {
+                        int k;
+                        for(k=0; k<5; ++k)
+                        {
+                            if(board[i+dr[d][0]*k][j+dr[d][1]*k]!=side)
+                            {
+                                break;
+                            }
+                        }
+                        if(k==5)
+                        {
+                            return side;
+                        }
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
+    void Print()
+    {
+        printf("\n");
+        for(int i=0; i<BOARD_SIZE+2; ++i)
+        {
+            if(i>=1 && i<=BOARD_SIZE-9)
+            //coordinate
+            {
+                printf(" %d ",BOARD_SIZE-i+1);
+            }
+            else if(i>=BOARD_SIZE-8 && i<=BOARD_SIZE)
+            {
+                printf("  %d ",BOARD_SIZE-i+1);
+            }
+            else
+            {
+                printf("    ");
+            }
+            for(int j=0; j<BOARD_SIZE+2; ++j)
+            {
+                printf(" ");
+                if(board[i][j]==0)
+                {
+                    if(i==BOARD_SIZE/2+1 && j==BOARD_SIZE/2+1)
+                    {
+                        printf(",");
+                    }
+                    else
+                    {
+                        printf(".");
+                    }
+                }
+                else if(board[i][j]==1)
+                {
+                    printf("o");
+                }
+                else if(board[i][j]==2)
+                {
+                    printf("+");
+                }
+                else if(board[i][j]==3)
+                {
+                    printf("#");
+                }
+            }
+            printf("\n");
+        }
+        printf("      ");
+        for(int i='A'; i<'A'+BOARD_SIZE; ++i)
+        {
+            printf(" %c",i);
+        }
+        printf("\n");
+    }
+
+
+
+
+};
+
+
+int main()
+{
+    Board A;
+    return 0;
+}
